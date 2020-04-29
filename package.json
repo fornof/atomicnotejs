@@ -9,7 +9,14 @@
   "author": "Robert Fornof",
   "license": "ISC",
   "dependencies": {
+    "@tonaljs/tonal": "^3.6.0",
+    "easymidi": "^1.0.3",
     "midi-writer-js": "^1.7.2",
     "mocha": "^7.1.1"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.1",
+    "uglify-js": "^3.9.1",
+    "watchify": "^3.11.1"
   }
 }
