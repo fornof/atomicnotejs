@@ -11,6 +11,8 @@
   "dependencies": {
     "@tonaljs/tonal": "^3.6.0",
     "easymidi": "^1.0.3",
+    "jzz": "^1.0.4",
+    "konva": "^5.0.2",
     "midi-writer-js": "^1.7.2",
     "mocha": "^7.1.1"
   },

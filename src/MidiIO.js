@@ -6,13 +6,40 @@ var track = new MidiWriter.Track();
          this.track = new MidiWriter.Track()
          this.midiWriter = MidiWriter
          this.config = {}
+         this.config.options = {chord: 'chord', rest:'rest'}
          this.config.decimals = { chord: '4' , rest:'1'}
          this.config.chordCases = {one:'1', two: '2', three:'3', four: '4'}
          this.currentTick = 0
          this.remain = {}
          this.remain.chord = 0
      }
-
+     handleNoteDecimal(decimals){
+        let remain = 0
+        switch(decimals[0]){
+            case this.config.decimals.rest:
+                let type = this.config.options.rest
+                return [type, remain]
+                
+            case this.config.decimals.chord:
+                switch(decimals[1] || '3'){
+                    case this.config.chordCases.one:
+                       remain = 1
+                        break
+                    case this.config.chordCases.two :
+                        remain = 2
+                        break
+                    case this.config.chordCases.three :
+                        remain = 3
+                        break
+                    case this.config.chordCases.four :
+                        remain = 4
+                        break
+                }
+                type = this.config.options.chord
+                return [type, remain]
+               
+}
+     }
      addNoteEvent(pitch, duration,startTick, incrementCurrentTick = true){
          startTick = startTick || this.currentTick
          console.log(pitch, duration, "noteEvent")
@@ -20,37 +47,14 @@ var track = new MidiWriter.Track();
              
             let decimals =  pitch.toString().split('.')[1]
             if(decimals){
-                switch(decimals[0]){
-                    case this.config.decimals.rest:
+               let [type,remain] = this.handleNoteDecimal(decimals)
+                if(type === this.config.options.rest){
                     const wait = duration
-                    pitch = Math.floor(pitch)
-                    if(incrementCurrentTick){
-                        this.currentTick += MidiWriter.Utils.getTickDuration(duration)
-                    }
                     return new MidiWriter.NoteEvent({startTick, wait, duration: duration+""});
-                
-                    case this.config.decimals.chord:
-                        switch(decimals[1] || '3'){
-                            case this.config.chordCases.one:
-                                this.remain.chord = 1
-                                break
-                            case this.config.chordCases.two :
-                                this.remain.chord = 2
-                                break
-                            case this.config.chordCases.three :
-                                this.remain.chord = 3
-                                break
-                            case this.config.chordCases.four :
-                                this.remain.chord = 4
-                                break
-                        }
-
-                        pitch = Math.floor(pitch)
-                        console.log('pitching a chord')
-                        incrementCurrentTick = false
-                        break;
-        }
-
+                }
+                else{
+                    this.remain.chord = remain
+                }
         }
             pitch = Math.floor(pitch)
          }

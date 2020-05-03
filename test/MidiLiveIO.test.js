@@ -1,12 +1,15 @@
 let ConvertNote = require("../src/ConvertNote")
-var Midi = require('../src/MidiLiveIO')
+var MidiLive = require('../src/MidiLiveIO')
+var Midi = require('../src/MidiIO')
 var Parser = require('../src/Parser')
 var assert = require('assert');
 var Parser = require('../src/Parser')
 describe('Convert Live', async function() {
   describe('converting things', function() {
     it('plays a scale in midi live', async function() {
+    this.timeout(40000)
       let midi = new Midi()
+      let midiLive = new MidiLive()
       let parser = new Parser()
       let convert = new ConvertNote()
       convert.minor_type = convert.type.MAJOR
@@ -14,12 +17,11 @@ describe('Convert Live', async function() {
       let comment = await parser.getWords('1 2 3 4 5 6 7 8')
 
       let notes = []
-      let track = midi.newTrack()
       for(const note of comment){
           notes.push(midi.addNoteEvent(convert.get_note(note),4))
       }
       console.log('notes', notes)
-       midi.writeTrack(notes, 'fornof 1' )
+     await midiLive.writeTrack(notes, 'fornof 1' )
     //   console.log(notes)
 
     });

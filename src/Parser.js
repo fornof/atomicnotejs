@@ -3,6 +3,10 @@ class Parser{
         this.offset = offset || 50
         this.last ={}
         this.last.duration = 16
+        this.config = {}
+        this.config.decimals = {  rest:'1', flat:'2', sharp:'3' ,chord: '4'}
+        this.config.single = {one:'1', two: '2', three:'3', four: '4', five: '5', six: '6' , seven: '7'
+        , eight:'8', nine:'9', zero:'0'}
         this.mode = {}
         this.mode.passthrough = 0
     }
@@ -37,21 +41,34 @@ class Parser{
     round(number, times=1000){
         return Math.round(times*number)/times
     }
+    handleNoteDecimals(wordArray){
+        let [whole,decimals] =  wordArray[0].toString().split('.')
+        let left = parseInt(whole)
+        if(decimals){
+            let steps = 1
+            let stepIn = decimals[1] || 1
+            if (stepIn){
+                steps = parseInt(stepIn)
+            }
+            switch(decimals[0]){
+                case this.config.decimals.flat:
+                    left -= steps
+                    if(left === 0 ){  left--  }
+                    break
+                case this.config.decimals.sharp:
+                    left += steps
+                    if(left === 0 ){  left++ }
+                    break
+            }
+        }
+    
+        wordArray[0]= parseFloat(left.toString() + "." + decimals)
+    }
     async handleStep(wordArray){
         if(Number.isInteger(wordArray[0]) || wordArray[0] === undefined){
             return
         }
-       let [whole,decimals] =  wordArray[0].toString().split('.')
-       let left = parseInt(whole)
-       if(decimals && decimals[0] === '2'){
-           left--
-           if(left === 0 ){  left--  }
-       }
-       if(decimals && decimals[0] === '3'){
-        left++
-        if(left === 0 ){  left++ }
-    }
-    wordArray[0]= parseFloat(left.toString() + "." + decimals)
+      this.handleNoteDecimals(wordArray)
     // this is by reference so no returning, wordArray[0] returns for us
     }
     async translateToMidi(inWordString){

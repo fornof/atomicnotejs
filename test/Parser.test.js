@@ -57,7 +57,7 @@ it('should return all the same number with different beats given 1 0:16 0 0 0 0 
   assert(notes[0][1] === 8) 
   assert(notes[7][1] === 16) 
 });
-it('should go dow halfstep 1.2 1.2 1 1.2  ', async function() {
+it('should go down halfstep 1.2 1.2 1 1.2  ', async function() {
   let parser = new Parser()
   let words = await parser.getWords("1.2 1.2 1 1.2")
   let convert = new ConvertNote()

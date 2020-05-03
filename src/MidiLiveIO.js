@@ -29,13 +29,20 @@ class MidiLiveIO {
                 channel: track.channel || 0
             });
             await this.sleep(this.quarter / track.duration)
-    
+            console.log('sleep',this.quarter / track.duration)
+            this.output.send('noteoff', {
+                note: track.pitch,
+                velocity: 0,
+                channel: 0
+            });
             this.output.send('noteoff', {
                 note: track.pitch,
                 velocity: 0,
                 channel: 0
             });
         }
+        this.output.send('stop');
+       
     
      }
 
