@@ -2,7 +2,7 @@ class Parser{
     constructor(offset){
         this.offset = offset || 50
         this.last ={}
-        this.last.duration = 16
+        this.last.duration = 4
         this.config = {}
         this.config.decimals = {  rest:'1', flat:'2', sharp:'3' ,chord: '4'}
         this.config.single = {one:'1', two: '2', three:'3', four: '4', five: '5', six: '6' , seven: '7'

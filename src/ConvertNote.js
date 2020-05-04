@@ -471,16 +471,21 @@ class ConvertNote {
 round(number, times=1000){
     return Math.round(times*number)/times
 }
+
 calculateOffset(my_note, minus){
     let note = Math.floor(my_note) % 7 
+
     let offset = 0
     
     if (minus === 1) {
-        offset = Math.floor((my_note - note) / 7) * 12
+        //offset = Math.floor((my_note - note) / 7) * 12
+        offset = Math.floor((my_note - note) / 7) *12
     }
     else {
-        offset = (Math.abs(my_note - note) / 7) * 12
+        //offset = (Math.abs(my_note - note) / 7) * 12
+        offset = Math.floor((Math.abs(my_note - note) / 7)) *12
     }
+    console.log([offset,note])
     return [offset, note] 
 }
 
@@ -491,12 +496,23 @@ get_note(my_note, zeroOffset = true) {
     let minus = 1
     let [whole,decimals] =  my_note.toString().split('.')
     let left = parseInt(whole)
-    if(left < 1){
+    if(left < 0){
         minus = -1
     }
-    if(zeroOffset){
-        left -= 1
+  
+     if(zeroOffset){
+
+        if( left > 0){
+            left -= 1
+        } 
+        else{
+           // left +=1
+        // say hi to your momma!
+        }
     }
+  
+    
+     
     let [offset,note] = this.calculateOffset(left, minus)
     // if (offset != 0) {
     //     continue
@@ -508,7 +524,7 @@ get_note(my_note, zeroOffset = true) {
     let decimal = parseFloat(decimals) || 0
     let sharpflat = 0
     //console.log('getnote, decimal' , decimal,'decimals', decimals,'mynote', left, 'note',note)
-
+    console.log(left, zeroOffset, decimal)
  
     if (this.minor_type == this.type.MAJOR) {
         return this.handle_major(note, offset, minus, sharpflat, decimal)
@@ -670,15 +686,15 @@ handle_major(note, offset = 0, minus = 1, sharpflat = 0, decimal = 0) {
     } else if (note == 6) {
         return this.start_note + (whole_step * 2 + half_step + whole_step * 3 + offset) + sharpflat + this.track.midi_offset + decimal
     } else if (note == -1) {
-        return this.start_note + (half_step * 1 + offset) * minus + sharpflat + this.track.midi_offset + decimal
+        return  this.start_note + (half_step * 1 + offset) * minus + sharpflat + this.track.midi_offset + decimal
     } else if (note == -2) {
-        return this.start_note + (half_step * 1 + whole_step * 1 + offset) * minus + sharpflat + this.track.midi_offset + decimal
+        return  this.start_note + (half_step * 1 + whole_step * 1 + offset) * minus + sharpflat + this.track.midi_offset + decimal
     } else if (note == -3) {
-        return this.start_note + (half_step * 1 + whole_step * 2 + offset) * minus + sharpflat + this.track.midi_offset + decimal
+        return  this.start_note + (half_step * 1 + whole_step * 2 + offset) * minus + sharpflat + this.track.midi_offset + decimal
     } else if (note == -4) {
-        return this.start_note + (half_step * 1 + whole_step * 3 + offset) * minus + sharpflat + this.track.midi_offset + decimal
+        return  this.start_note + (half_step * 1 + whole_step * 3 + offset) * minus + sharpflat + this.track.midi_offset + decimal
     } else if (note == -5) {
-        return this.start_note + (half_step * 1 + whole_step * 3 + half_step * 1 + offset) * minus + sharpflat + this.track.midi_offset + decimal
+        return  this.start_note + (half_step * 1 + whole_step * 3 + half_step * 1 + offset) * minus + sharpflat + this.track.midi_offset + decimal
     } else if (note == -6) {
         return this.start_note + (half_step * 1 + whole_step * 3 + half_step * 1 + whole_step + offset) * minus + sharpflat + this.track.midi_offset + decimal
     }

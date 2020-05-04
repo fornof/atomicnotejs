@@ -65,7 +65,26 @@ describe('ConvertNote', async function() {
         convert.minor_type = convert.type.MELODIC
         convert.start_note = convert.getStartNoteOffset('c',3,0, true)
         console.log('startkey = ',convert.start_note)
-        let comment = await parser.getWords('1 2 3 4 5 6 7 8')
+        let comment = await parser.getWords('1 -1')
+        let notes = []
+        let track = midi.newTrack()
+        for(const note of comment){
+            notes.push(midi.addNoteEvent(convert.get_note(note),1))
+        }
+        midi.addNotesToTrack(track, notes)
+        //midi.writeTrack(track, 'coolness.mid' )
+        //console.log(notes)
+      
+      });
+
+      it.only('give me a scale in major', async function() {
+        let midi = new Midi()
+        let parser = new Parser()
+        let convert = new ConvertNote()
+        convert.minor_type = convert.type.MAJOR
+        convert.start_note = convert.getStartNoteOffset('c',4,0, true)
+        console.log('startkey = ',convert.start_note)
+        let comment = await parser.getWords('1 -1')
         let notes = []
         let track = midi.newTrack()
         for(const note of comment){

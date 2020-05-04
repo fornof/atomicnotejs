@@ -1,55 +1,40 @@
 <html>
     <head>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.6/processing.js"></script> -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js" integrity="sha256-Pg1di+fBF53Rbh9oZR/FeD1xsFzTLC963lcac1D0ias=" crossorigin="anonymous"></script>
+       
     </head>
     <body>
-        <canvas id='sketch' width="1200" height="1000   " data-processing-sources="/btn/btn.pde"></canvas>
+        <!-- <canvas id='sketch' width="1200" height="1000   " data-processing-sources="/btn/btn.pde"></canvas>
 
-        <script type="application/javascript">
-       </script>
-        
-     
-    
-        <script type="application/javascript">
-            var midiNotes = [[55,4],[65,2],[66,3]]
-                       var jsString = "Hello from JavaScript!";
-                        function getMidi() {
-                            return midiNotes
-                       };
-                       async function sleep(ms){
-                           return new Promise((resolve)=> setTimeout(resolve, ms))
-                       }
-                       var processingInstance
-                       async function proc(fx, args){
-                            while(!processingInstance){
-                                
-                                await this.sleep(1000)
-                                processingInstance = Processing.getInstanceById('sketch')
-                                console.log('waiting,', processingInstance)
-                            }
-                            processingInstance[fx](...args)
-                       }
-                       async function main(){
-                       await proc('logme', ['fetcher stuff@'])
-                       await proc('logme', ['fetcher stuffdd@'])
-                       }
-                       main()
-                       
-                    </script>
+         -->
+         <!-- <object type="image/svg+xml" width="900" height="80"  data="/img/stave.svg">
+            Your browser does not support SVG
+          </object> -->
+          <div id="container">
+            <!-- <svg id='stave' src="/img/stave.svg"></svg> -->
+          </div>
+          <br/>
+        <br/>
+        <br/>
+   
         <!-- <canvas id="canvasRobert" width="900" height="450" style="background: transparent;  width: 1901px; height: 162.5px; display: block;"></canvas> -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/konva@4.0.0/konva.min.js"></script>
       
-       
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js" integrity="sha256-Pg1di+fBF53Rbh9oZR/FeD1xsFzTLC963lcac1D0ias=" crossorigin="anonymous"></script>
        <div id="container"></div>
+       <link rel="stylesheet" type="text/css" href="main.css">
+       <script src="./p5.svg.js" type="text/javascript"></script>
         <script src="https://cdn.jsdelivr.net/npm/jzz"></script> 
         <script src="./browserAtomic.js"></script>
         <script src="./index.js"></script>
+        <script >
+   
+            main()
+        </script>
         <textarea id="txtInput" rows="4" cols="50">1 2 3 4 5</textarea><br/>
-        <button id='submit' text="submit" onclick="onSubmit()">Submit</button>
-        <script>draw()</script>
-
+        <button id='submit' text="submit" onclick="onSubmit()">Submit</button><br/>
+        <div id="txtHighlight"></div>
 
 
         <style type="text/css">
