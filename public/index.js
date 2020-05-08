@@ -10,20 +10,24 @@ async function playNotes(notes, highlight) {
     }
         let previous = undefined
     for (const i in  notes) {
-        draw.handleTxtHightlight(i)
-        if(highlight &&highlight.length > 0){
-            if(previous){
-                previous.svg.style.fill = 'rgb(0,0,0)'
-            }
-            previous = highlight[i]
-            highlight[i].svg.style.fill = 'rgb(0, 22, 256)'
-        }
+        
         JZZ().or('Cannot start MIDI engine!')
             .openMidiOut().or('Cannot open MIDI Out port!')
             .send([0x90, notes[i].pitch, 127]) // note on
             //.wait(1 / note.duration * 1000)
+            draw.handleTxtHightlight(i)
+      
+            if(highlight &&highlight.length > 0){
+                if(previous){
+                    previous.svg.style.fill = 'rgb(0,0,0)'
+                }
+                previous = highlight[i]
+                highlight[i].svg.style.fill = 'rgb(0, 22, 256)'
+                draw.get('txtNote').innerHTML = highlight[i].name
+            }
            console.log('duration to sleep',notes[i].duration)
         await sleep((1 / notes[i].duration) * 1500)
+     
         JZZ().or('Cannot start MIDI engine!')
             .openMidiOut().or('Cannot open MIDI Out port!')
             .send([0x80, notes[i].pitch, 0]);  // note off
@@ -39,6 +43,10 @@ class DrawNote {
         this.txtArray = [] // contains all text in the song
         this.notes = []// contains all the notes in the song,
         this.noteOffset = {}
+        this.id = {}
+        this.id.stave = 0
+        this.staves = []
+        this.staveNoteMax = 15
         this.midiToLetter = {
             0: "c0",
             12: "c1",
@@ -289,14 +297,9 @@ class DrawNote {
     }
     calculateY(midiNote, duration) {
         let letter = this.midiToLetter[midiNote]
-        let crosses = undefined
         const calculation = this.letterToY[letter[0]] - this.octaveY *( parseInt(letter[1])-4)
         console.log('letters',letter[0],this.octaveY *( parseInt(letter[1])-4),this.letterToY[letter[0]] - this.octaveY *( parseInt(letter[1])-4))
-        if(calculation >= this.crossThreshold){
-                crosses = letter
-    
-        }
-        return [calculation, crosses]
+        return [calculation, letter]
     }
 
     get(id) {
@@ -350,9 +353,11 @@ class DrawNote {
         //obj.setAttribute('style', "transform: scale(400, 50);")
         //obj.setAttribute('viewBox', "0 0 200 100 ")
     }
+    // draw.onClick.bind(draw, quarter, pitchDurationArray[i],draw.notes.length - 1,calculationY[1])
     onClick(svg, pitchDuration,notesIndex, noteMidi) {
         playNotes([pitchDuration])
-        console.log('note index', notesIndex, typeof notesIndex)
+        console.log('note ',noteMidi)
+        this.get('txtNote').innerHTML = noteMidi
         this.handleTxtHightlight(notesIndex)
         //console.log(noteMidi, pitchDuration.pitch)
         // todo : redo so lesss iterative, so previously selected gets set , and then this gets set. 
@@ -371,19 +376,30 @@ class DrawNote {
         console.log('pitchdurationarray drawnotes',pitchDurationArray)
         if (!this.quarter_up) {
             this.quarter_up = await this.loadSvg('quarter', "/img/quarter_up.svg", 'container', false)
+            this.sharp = await this.loadSvg('quarter', "/img/sharp.svg", 'container', false)
+            this.flat = await this.loadSvg('quarter', "/img/flat.svg", 'container', false)
+            console.log('sharpflat',this.sharp, this.flat)
         }
-        this.clearNotes()
+        if(this.notes.length > 0 ){
+            this.clearNotes()
+        }
+        let left = 0
         for (let i = 0; i < pitchDurationArray.length; i++) {
-            const quarter = draw.clone(draw.quarter_up)
-            console.log(draw.get('container'))
-            draw.get('container').appendChild(quarter)
-            draw.notes.push({ svg: quarter })
+            const quarter = this.clone(this.quarter_up)
+            console.log(this.get('container'))
+            this.get('container').appendChild(quarter)
             let calculationY = this.calculateY(pitchDurationArray[i].pitch,pitchDurationArray[i].duration)
+            this.notes.push({ svg: quarter, name: calculationY[1] })
+        
             if(calculationY[1]){
-                let i = 0 
+               // let i = 0 
                 let item = calculationY[1][0]
                     
                     console.log(item)
+                    
+                    if(pitchDurationArray[i].pitch <  this.getStaveOffset()+this.crossThreshold){
+                       
+                    
                     switch(item){
                         case 'c':
                             quarter.innerHTML+= `<line id="ccross${item}" x1="2" y1="${39}" x2="104" y2="${39}" style="stroke:rgb(0,0,0);stroke-width:2"></line>`
@@ -398,13 +414,59 @@ class DrawNote {
                             //quarter.innerHTML+= `<line id="ccross${item}" x1="2" y1="${39}" x2="104" y2="${39}" style="stroke:rgb(0,0,0);stroke-width:2"></line>`
                             break;
                         }
-                   i++;
+                    }
+                   //i++;
                 }
                 // onClick(svg, pitchDuration,notesIndex, noteMidi) {
-                quarter.onclick = draw.onClick.bind(draw, quarter, pitchDurationArray[i],draw.notes.length - 1,calculationY[1])
-            
-            quarter.setAttribute('style', `position:absolute;top:${calculationY[0]}px;left:${40 + i * 30}px;`) //background:rgb(${50+i*30},${60+i*15},22)
+                quarter.onclick = draw.onClick.bind(draw, quarter, pitchDurationArray[i],this.notes.length - 1,calculationY[1])
+                let transform = "transform: rotate(180deg);transform-origin: 65.5% 55.5%;"
+                if(pitchDurationArray[i].pitch < 60){
+                    transform = ''
+                }
+
+               
+               
+            quarter.setAttribute('style', `position:absolute;top:${this.getStaveOffset()+calculationY[0]}px;left:${40 + left }px;${transform}`) //background:rgb(${50+i*30},${60+i*15},22)
+            if(this.notes.length % (this.staveNoteMax -1 )== 0 ){
+                left =  0
+             }
+             else{
+                 left += 30 
+             }
         }
+    }
+    getStaveOffset(){
+        if(this.notes.length < this.staveNoteMax){
+            return this.staves[0]
+        }
+        else{
+            return this.staves[1]
+        }
+    }
+    async createStave(topOffset=50){
+
+        let parentStave = document.createElement("div")
+        parentStave.id =  'parentStave'+this.id.stave
+        console.log(parentStave, 'ps')
+        this.get('container').appendChild(parentStave)
+        let stave = await this.loadSvg( 'stave'+this.id.stave, "/img/stave.svg", parentStave.id)
+       
+        await this.scale(stave, 100, 50, 1600, 50)
+        let treble = await draw.loadSvg("treble"+this.id.stave, "/img/treble.svg", parentStave.id)
+        parentStave.setAttribute("style", `position:relative;top:${topOffset}px`)
+        treble.setAttribute('viewBox', '0 0 1000 1300')
+        await this.scale(treble, 10, -55, 60, 70)
+        treble.parentNode.classList.add("treble-parent")
+        treble.classList.add("treble")
+        this.id.stave += 1
+        console.log(this.id.stave)
+        if(this.staves.length == 0){
+            this.staves.push(topOffset)
+        } else{
+            this.staves.push(topOffset + 50)
+        }
+        this.get('controls').setAttribute('style', `position:relative;top:${topOffset+30}px`)
+        return parentStave
     }
 }
 let atomic = new AtomicNote()
@@ -412,24 +474,16 @@ let draw = new DrawNote()
 
 async function main() {
     //id, svgUrl, parent = 'container'
-    let stave = await draw.loadSvg('stave', "/img/stave.svg", 'container')
-    await draw.scale(stave, 100, 50, 1600, 50)
-    let treble = await draw.loadSvg("treble", "/img/treble.svg", 'container')
-    console.log(treble)
-
-    treble.setAttribute('viewBox', '0 0 1000 1300')
-    draw.scale(treble, 10, 30, 60, 70)
-    treble.parentNode.classList.add("treble-parent")
-    treble.classList.add("treble")
-    if (!draw.quarter_up) {
-        draw.quarter_up = await draw.loadSvg('quarter', "/img/quarter_up.svg", 'container', false)
-    }
-    console.log(draw.quarter_up, 'quarter_up')
-    draw.quarter_up.setAttribute('viewBox', '0 0 25 70')
-    draw.quarter_up.setAttribute('class', 'note')
-    draw.quarter_up.setAttribute('style', `fill:green`) //background:rgb(${50+i*30},${60+i*15},22)
-    draw.scale(draw.quarter_up, 20, 30, 25, 70)
-
+  
+    // if (!draw.quarter_up) {
+    //     draw.quarter_up = await draw.loadSvg('quarter', "/img/quarter_up.svg", 'container', false)
+    // }
+    // draw.quarter_up.setAttribute('viewBox', '0 0 25 70')
+    // draw.quarter_up.setAttribute('class', 'note')
+    // draw.quarter_up.setAttribute('style', `fill:green`) //background:rgb(${50+i*30},${60+i*15},22)
+    // draw.scale(draw.quarter_up, 20, 30, 25, 70)
+    await draw.createStave(50)
+    await draw.createStave(100)
 }
 
 

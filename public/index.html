@@ -10,12 +10,21 @@
          <!-- <object type="image/svg+xml" width="900" height="80"  data="/img/stave.svg">
             Your browser does not support SVG
           </object> -->
+          <div >
           <div id="container">
             <!-- <svg id='stave' src="/img/stave.svg"></svg> -->
           </div>
           <br/>
-        <br/>
-        <br/>
+          <br/>
+          <br/>
+          <div id="controls">
+            <textarea id="txtInput" rows="4" cols="50">1 2 3 4 5</textarea><br/>
+            <button id='submit' text="submit" onclick="onSubmit()">Submit</button><br/>
+            <div class="relative" id="txtHighlight"></div>
+            <div id="txtNote"></div>
+          </div>
+        </div>
+  
    
         <!-- <canvas id="canvasRobert" width="900" height="450" style="background: transparent;  width: 1901px; height: 162.5px; display: block;"></canvas> -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -32,9 +41,7 @@
    
             main()
         </script>
-        <textarea id="txtInput" rows="4" cols="50">1 2 3 4 5</textarea><br/>
-        <button id='submit' text="submit" onclick="onSubmit()">Submit</button><br/>
-        <div id="txtHighlight"></div>
+   
 
 
         <style type="text/css">

@@ -77,7 +77,7 @@ describe('ConvertNote', async function() {
       
       });
 
-      it.only('give me a scale in major', async function() {
+      it('give me a scale in major', async function() {
         let midi = new Midi()
         let parser = new Parser()
         let convert = new ConvertNote()

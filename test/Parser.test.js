@@ -68,10 +68,9 @@ it('should go down halfstep 1.2 1.2 1 1.2  ', async function() {
     noteMidi[0] = convert.get_note(noteMidi[0])
     notes.push(noteMidi )
   }
-  
-
-  assert(notes[0][0] === 37) 
-  assert(notes[3][0] === 37) 
+  console.log(notes[0], notes[3])
+  assert(notes[0][0] === 39) 
+  assert(notes[3][0] === 39) 
 });
 it('should go up halfstep 1.3 1.3 1 1.3  ', async function() {
   let parser = new Parser()
