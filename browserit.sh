@@ -1,0 +1,1 @@
+browserify index.js --s AtomicNote -o public/browserAtomic.js 
