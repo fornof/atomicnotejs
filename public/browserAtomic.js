@@ -2241,6 +2241,7 @@ class AtomicNote{
         // this.midiLive = new MidiLive()
         this.parser = new Parser()
         this.convert = new ConvertNote()
+
         console.log('all imported!')
     }
     async readMidi(readString){

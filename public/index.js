@@ -1,3 +1,4 @@
+let atomic = new AtomicNote()
 async function playNotes(notes, highlight) {
   
     console.log(notes)
@@ -32,14 +33,22 @@ async function playNotes(notes, highlight) {
             .openMidiOut().or('Cannot open MIDI Out port!')
             .send([0x80, notes[i].pitch, 0]);  // note off
     }
-    JZZ().openMidiIn().or('Cannot open MIDI In port!')
-        .and(function () { console.log('MIDI-In: ', this.name()); })
+    JZZ().openMidiOut().or('Cannot open MIDI In port!')
+        .and(function () { console.log('MIDI-Out: ', this.name()); })
         .connect(function (msg) { console.log(msg.toString()); })
         .wait(10000).close();
 }
 
 class DrawNote {
     constructor() {
+        this.base = ''
+        this.img = {
+                    quarter : this.base+'/img/quarter_up.svg', 
+                    treble: this.base +'/img/treble.svg' , 
+                    stave: this.base + '/img/stave.svg',
+                    flat: this.base + '/img/flat.svg',
+                    sharp: this.base + '/img/sharp.svg',
+                }
         this.txtArray = [] // contains all text in the song
         this.notes = []// contains all the notes in the song,
         this.noteOffset = {}
@@ -375,9 +384,9 @@ class DrawNote {
     async drawNotes(pitchDurationArray) {
         console.log('pitchdurationarray drawnotes',pitchDurationArray)
         if (!this.quarter_up) {
-            this.quarter_up = await this.loadSvg('quarter', "/img/quarter_up.svg", 'container', false)
-            this.sharp = await this.loadSvg('quarter', "/img/sharp.svg", 'container', false)
-            this.flat = await this.loadSvg('quarter', "/img/flat.svg", 'container', false)
+            this.quarter_up = await this.loadSvg('quarter', this.img.quarter, 'container', false)
+            this.sharp = await this.loadSvg('sharp', this.img.sharp, 'container', false)
+            this.flat = await this.loadSvg('flat', this.img.flat, 'container', false)
             console.log('sharpflat',this.sharp, this.flat)
         }
         if(this.notes.length > 0 ){
@@ -449,10 +458,10 @@ class DrawNote {
         parentStave.id =  'parentStave'+this.id.stave
         console.log(parentStave, 'ps')
         this.get('container').appendChild(parentStave)
-        let stave = await this.loadSvg( 'stave'+this.id.stave, "/img/stave.svg", parentStave.id)
+        let stave = await this.loadSvg( 'stave'+this.id.stave, this.img.stave, parentStave.id)
        
         await this.scale(stave, 100, 50, 1600, 50)
-        let treble = await draw.loadSvg("treble"+this.id.stave, "/img/treble.svg", parentStave.id)
+        let treble = await draw.loadSvg("treble"+this.id.stave, this.img.treble, parentStave.id)
         parentStave.setAttribute("style", `position:relative;top:${topOffset}px`)
         treble.setAttribute('viewBox', '0 0 1000 1300')
         await this.scale(treble, 10, -55, 60, 70)
@@ -469,7 +478,7 @@ class DrawNote {
         return parentStave
     }
 }
-let atomic = new AtomicNote()
+
 let draw = new DrawNote()
 
 async function main() {
